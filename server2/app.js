@@ -85,17 +85,56 @@ class AppServer {
         const reqUrl = new URL(req.url, `https://${req.headers.host}`);
         const pathname = reqUrl.pathname;
 
+        // Set CORS headers
         res.setHeader('Access-Control-Allow-Origin', '*');
-        res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+        // Handle OPTIONS method immediately and return
+        if (req.method === 'OPTIONS') {
+            res.writeHead(204);
+            res.end();
+            return;
+        }
+
+        // Handle GET requests
         if (req.method === 'GET' && pathname.startsWith('/lab5/api/v1/sql')) {
             const sqlQuery = decodeURIComponent(reqUrl.searchParams.get('query'));
             this.patientDB.fetchData(sqlQuery, res);
-        } else {
+            return; // Ensure no further processing for this request
+        }
+
+        // Handle POST requests
+        if (req.method === 'POST' && pathname.startsWith('/lab5/api/v1/sql')) {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+            req.on('end', () => {
+                try {
+                    const postData = JSON.parse(body);
+                    const sqlQuery = postData.query;
+                    console.log("Executing SQL query:", sqlQuery);
+                    // Now fetchData is responsible for sending the response
+                    this.patientDB.fetchData(sqlQuery, res);
+                } catch (err) {
+                    console.error('Error parsing JSON:', err);
+                    if (!res.headersSent) {
+                        res.writeHead(400, { 'Content-Type': 'text/plain' });
+                        res.end('Bad Request: Error parsing JSON');
+                    }
+                }
+            });
+            return; // Prevent further execution outside this block
+        }
+
+        // If none of the above, send 404 Not Found
+        if (!res.headersSent) {
             res.writeHead(404, { 'Content-Type': 'text/plain' });
             res.end('Not Found');
         }
     }
+
 
     listen(port) {
         this.server.listen(port, () => {
