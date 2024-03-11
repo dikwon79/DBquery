@@ -1,7 +1,7 @@
 const mysql = require('mysql2');
 const http = require('http');
 const { URL } = require('url');
-const messages = require("./lang/messages/en/user");
+const messages = require("./server2/lang/messages/en/user");
 
 class PatientDatabase {
     constructor() {

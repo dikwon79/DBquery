@@ -1,60 +1,103 @@
-class ApiClient {
-    constructor(baseUrl) {
-        this.baseUrl = baseUrl;
+class SqlClient {
+    constructor() {
+        this.baseUrl = messages.baseUrl;
+        document.addEventListener('DOMContentLoaded', () => {
+            // Use arrow functions to maintain the correct context of `this`
+            document.getElementById('submitQuery').addEventListener('click', () => this.submitQuery());
+            document.getElementById('insert').addEventListener('click', () => this.insertPatient());
+        });
     }
 
-    sendRequest(method, endpoint, data, callback) {
+    insertPatient() {
+        let sqlQuery = document.getElementById('sqlQuery').value.trim();
+
+        let queryType;
+        if (sqlQuery.toUpperCase().startsWith('(')) {
+            queryType = 'POST';
+            sqlQuery = messages.insert + sqlQuery;
+        } else {
+            alert(messages.noservice);
+            return;
+        }
+        // Use arrow function to maintain the correct context of `this`
+        this.sendRequest(queryType, messages.endpoint, sqlQuery);
+    }
+
+    submitQuery() {
+        const sqlQuery = document.getElementById('sqlQuery').value.trim();
+
+        let queryType, endpoint;
+        if (sqlQuery.toUpperCase().startsWith('SELECT')) {
+            queryType = 'GET';
+            endpoint = `/lab5/api/v1/sql?query=${encodeURIComponent(sqlQuery)}`;
+        } else if (sqlQuery.toUpperCase().startsWith('INSERT')) {
+            queryType = 'POST';
+            endpoint = messages.endpoint;
+        } else {
+            alert(messages.queryAllowed);
+            return;
+        }
+        // Use arrow function to maintain the correct context of `this`
+        this.sendRequest(queryType, endpoint, sqlQuery);
+    }
+
+    sendRequest(queryType, endpoint, sqlQuery) {
+        // Perform the AJAX request
         const xhr = new XMLHttpRequest();
-        xhr.open(method, `${this.baseUrl}${endpoint}`, true);
-        xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        const url = `${this.baseUrl}${endpoint}`;
+        xhr.open(queryType, url, true);
         xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                callback(xhr.status, xhr.responseText);
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+                if (xhr.status === 200) {
+                    if (queryType === "GET")
+                    {
+                        document.getElementById('response').innerHTML = ''; // initialize before contents 
+
+                        // JSON data parsing
+                        var responseData = JSON.parse(xhr.responseText);
+
+                        // create table
+                        var tableHtml = '<table>';
+                        tableHtml += '<tr><th>Patient ID</th><th>Name</th><th>Date of Birth</th></tr>';
+
+                        responseData.forEach(function(patient) {
+                            tableHtml += '<tr>';
+                            tableHtml += '<td>' + patient.patientid + '</td>';
+                            tableHtml += '<td>' + patient.name + '</td>';
+                           
+                            var dateOfBirth = patient.dateOfBirth.substring(0, 10); // YYYY-MM-DD 
+                            tableHtml += '<td>' + dateOfBirth + '</td>';
+                            tableHtml += '</tr>';
+                        });
+
+                        tableHtml += '</table>';
+
+                        // #response 
+                        document.getElementById('response').innerHTML = tableHtml;
+                    }
+                    else {
+
+                        var parsedResponse = JSON.parse(xhr.responseText);
+                        console.log(xhr.responseText);
+                        // info value
+                        var info = parsedResponse.info == "" ? messages.zero : parsedResponse.info;
+
+                        console.log(info);
+                        document.getElementById('response').innerHTML = messages.save + info;
+
+                    }
+                } else {
+                    document.getElementById('response').innerText = messages.error + xhr.statusText;
+                }
             }
         };
-        if (data) {
-            xhr.send(data);
+        if (queryType === 'POST') {
+             xhr.setRequestHeader('Content-Type', 'application/json');
+             xhr.send(JSON.stringify({ query: sqlQuery }));
         } else {
-            xhr.send();
+             xhr.send();
         }
     }
 }
 
-class QueryHandler {
-    constructor(apiClient) {
-        this.apiClient = apiClient;
-    }
-
-    insertPatients() {
-        const data = JSON.stringify({
-            query: "INSERT INTO patients (name, dateOfBirth) VALUES ('Sara Brown', '1901-01-01'), ('John Smith', '1941-01-01'), ('Jack Ma', '1961-01-30'), ('Elon Musk', '1999-01-01')"
-        });
-        this.apiClient.sendRequest('POST', '/lab5/api/v1/sql', data, this.handleResponse.bind(this));
-    }
-
-    submitQuery() {
-        const query = document.getElementById('sqlQuery').value.trim();
-        const isSelect = query.toLowerCase().startsWith('select');
-        const method = isSelect ? 'GET' : 'POST';
-        const endpoint = isSelect ? `/lab5/api/v1/sql?query=${encodeURIComponent(query)}` : '/lab5/api/v1/sql';
-        const data = isSelect ? null : JSON.stringify({ query: query });
-
-        this.apiClient.sendRequest(method, endpoint, data, this.handleResponse.bind(this));
-    }
-
-    handleResponse(status, responseText) {
-        document.getElementById('response').innerText = status === 200 ? responseText : `Error: ${status}`;
-    }
-}
-
-
-const apiClient = new ApiClient('http://localhost:8080');
-const queryHandler = new QueryHandler(apiClient);
-
-document.getElementById('insert').addEventListener('click', () => {
-    queryHandler.insertPatients();
-});
-
-document.getElementById('submitQuery').addEventListener('click', () => {
-    queryHandler.submitQuery();
-});
+const dbClient = new SqlClient();
