@@ -49,16 +49,17 @@ class SqlClient {
         xhr.open(queryType, url, true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
+
                 if (xhr.status === 200) {
                     if (queryType === "GET")
                     {
                         document.getElementById('response').innerHTML = ''; // initialize before contents 
 
                         // JSON data parsing
-                        var responseData = JSON.parse(xhr.responseText);
+                        let responseData = JSON.parse(xhr.responseText);
 
                         // create table
-                        var tableHtml = '<table>';
+                        let tableHtml = '<table>';
                         tableHtml += '<tr><th>Patient ID</th><th>Name</th><th>Date of Birth</th></tr>';
 
                         responseData.forEach(function(patient) {
@@ -78,17 +79,17 @@ class SqlClient {
                     }
                     else {
 
-                        var parsedResponse = JSON.parse(xhr.responseText);
+                        let parsedResponse = JSON.parse(xhr.responseText);
                         console.log(xhr.responseText);
                         // info value
-                        var info = parsedResponse.info == "" ? messages.zero : parsedResponse.info;
+                        info = parsedResponse.info == "" ? messages.zero : parsedResponse.info;
 
                         console.log(info);
                         document.getElementById('response').innerHTML = messages.save + info;
 
                     }
                 } else {
-                    document.getElementById('response').innerText = messages.error + xhr.statusText;
+                    document.getElementById('response').innerText = messages.error + xhr.responseText;
                 }
             }
         };

@@ -58,6 +58,7 @@ class PatientDatabase {
 
         if (sqlQuery.toUpperCase().includes('UPDATE') || sqlQuery.toUpperCase().includes('DELETE')) {
             console.error(messages.notAllowed);
+            
             res.writeHead(403, { 'Content-Type': 'application/json' });
             res.end(messages.fobidden);
             return;
