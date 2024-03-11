@@ -58,15 +58,15 @@ class PatientDatabase {
 
         if (sqlQuery.toUpperCase().includes('UPDATE') || sqlQuery.toUpperCase().includes('DELETE')) {
             console.error(messages.notAllowed);
-            res.writeHead(403, { 'Content-Type': 'text/plain' });
-            res.end(messages.fobidden);
+            res.writeHead(403, { 'Content-Type': 'text/json' });
+            res.end(messages.notAllowed);
             return;
         }
         
         this.connection.query(sqlQuery, function(err, results, fields) {
             if (err) {
                 console.error(messages.errorMysql + err.stack);
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.writeHead(500, { 'Content-Type': 'text/json' });
                 res.end(messages.severError);
                 return;
             }
