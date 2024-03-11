@@ -111,8 +111,13 @@ class AppServer {
         }
 
         // Handle GET requests
+        // Handle GET requests
         if (req.method === 'GET' && pathname.startsWith(messages.endpoint)) {
-            const sqlQuery = decodeURIComponent(reqUrl.searchParams.get('query'));
+
+            const lastIndex = reqUrl.lastIndexOf('"');
+            const sqlQuery = reqUrl.substring(reqUrl.lastIndexOf('/') + 1, lastIndex); 
+
+            //const sqlQuery = decodeURIComponent(reqUrl.searchParams.get('query'));
             this.patientDB.fetchData(sqlQuery, res);
             return; // Ensure no further processing for this request
         }

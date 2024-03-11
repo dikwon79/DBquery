@@ -1,3 +1,4 @@
+///*we are used chatgpt3.5 to implement these codes and design sites*/
 const mysql = require('mysql2');
 const http = require('http');
 const { URL } = require('url');
@@ -58,15 +59,15 @@ class PatientDatabase {
 
         if (sqlQuery.toUpperCase().includes('UPDATE') || sqlQuery.toUpperCase().includes('DELETE')) {
             console.error(messages.notAllowed);
-            res.writeHead(403, { 'Content-Type': 'text/plain' });
-            res.end(messages.fobidden);
+            res.writeHead(403, { 'Content-Type': 'text/json' });
+            res.end(messages.notAllowed);
             return;
         }
         
         this.connection.query(sqlQuery, function(err, results, fields) {
             if (err) {
                 console.error(messages.errorMysql + err.stack);
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.writeHead(500, { 'Content-Type': 'text/json' });
                 res.end(messages.severError);
                 return;
             }
@@ -112,7 +113,11 @@ class AppServer {
 
         // Handle GET requests
         if (req.method === 'GET' && pathname.startsWith(messages.endpoint)) {
-            const sqlQuery = decodeURIComponent(reqUrl.searchParams.get('query'));
+
+            const lastIndex = url.lastIndexOf('"');
+            const sqlQuery = url.substring(url.lastIndexOf('/') + 1, lastIndex); 
+
+            //const sqlQuery = decodeURIComponent(reqUrl.searchParams.get('query'));
             this.patientDB.fetchData(sqlQuery, res);
             return; // Ensure no further processing for this request
         }
