@@ -11,7 +11,7 @@ const messages = {
   resultQuery : 'Query results: ',
   closingError : 'Error closing MySQL connection: ',
   closed : 'MySQL connection closed.',
-  endpoint : '/lab5/api/v1/sql',
+  endpoint : '/lab5/api/v1/sql/',
   sqlExcute : "Executing SQL query:",
   errorParsing : 'Error parsing JSON:',
   badRequest : 'Bad Request: Error parsing JSON',
