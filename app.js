@@ -58,7 +58,7 @@ class PatientDatabase {
 
         if (sqlQuery.toUpperCase().includes('UPDATE') || sqlQuery.toUpperCase().includes('DELETE')) {
             console.error(messages.notAllowed);
-            res.writeHead(403, { 'Content-Type': 'text/json' });
+            res.writeHead(403, { 'Content-Type': 'application/json' });
             res.end(messages.fobidden);
             return;
         }
@@ -66,7 +66,7 @@ class PatientDatabase {
         this.connection.query(sqlQuery, function(err, results, fields) {
             if (err) {
                 console.error(messages.errorMysql + err.stack);
-                res.writeHead(500, { 'Content-Type': 'text/json' });
+                res.writeHead(500, { 'Content-Type': 'application/json' });
                 res.end(messages.severError);
                 return;
             }
