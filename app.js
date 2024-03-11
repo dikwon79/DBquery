@@ -59,7 +59,7 @@ class PatientDatabase {
         if (sqlQuery.toUpperCase().includes('UPDATE') || sqlQuery.toUpperCase().includes('DELETE')) {
             console.error(messages.notAllowed);
             res.writeHead(403, { 'Content-Type': 'text/json' });
-            res.end(messages.notAllowed);
+            res.end(messages.fobidden);
             return;
         }
         
@@ -109,17 +109,22 @@ class AppServer {
             res.end();
             return;
         }
-
-        // Handle GET requests
+        
         // Handle GET requests
         if (req.method === 'GET' && pathname.startsWith(messages.endpoint)) {
+            
 
-            const lastIndex = reqUrl.lastIndexOf('"');
-            const sqlQuery = reqUrl.substring(reqUrl.lastIndexOf('/') + 1, lastIndex); 
-
-            //const sqlQuery = decodeURIComponent(reqUrl.searchParams.get('query'));
+            const sqlIndex = pathname.indexOf('/sql/') + 5; 
+            let sqlQuery = decodeURIComponent(pathname.substring(sqlIndex));
+            
+           
+        
+            sqlQuery = sqlQuery.replace(/"/g, '');
+            console.log(sqlQuery); 
+          
+     
             this.patientDB.fetchData(sqlQuery, res);
-            return; // Ensure no further processing for this request
+            return; 
         }
 
         // Handle POST requests

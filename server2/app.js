@@ -112,14 +112,19 @@ class AppServer {
         }
 
         // Handle GET requests
-        if (req.method === 'GET' && pathname.startsWith(messages.endpoint)) {
+         // Handle GET requests
+         if (req.method === 'GET' && pathname.startsWith(messages.endpoint)) {
+            
 
-            const lastIndex = url.lastIndexOf('"');
-            const sqlQuery = url.substring(url.lastIndexOf('/') + 1, lastIndex); 
-
-            //const sqlQuery = decodeURIComponent(reqUrl.searchParams.get('query'));
+            const sqlIndex = pathname.indexOf('/sql/') + 5; 
+            let sqlQuery = decodeURIComponent(pathname.substring(sqlIndex));
+            
+        
+            sqlQuery = sqlQuery.replace(/"/g, '');
+            console.log(sqlQuery); 
+     
             this.patientDB.fetchData(sqlQuery, res);
-            return; // Ensure no further processing for this request
+            return; 
         }
 
         // Handle POST requests
