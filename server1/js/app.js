@@ -16,6 +16,7 @@ class SqlClient {
         if (sqlQuery.toUpperCase().startsWith('(')) {
             queryType = 'POST';
             sqlQuery = messages.insert + sqlQuery;
+            console.log(sqlQuery);
         } else {
             alert(messages.noservice);
             return;

@@ -7,7 +7,7 @@ const messages = {
   notAllowed : 'Update and delete queries are not allowed.',
   fobidden : 'Forbidden',
   errorMysql : 'Error querying MySQL: ',
-  severEcdrror : 'Internal Server Error',
+  severError : 'Internal Server Error',
   resultQuery : 'Query results: ',
   closingError : 'Error closing MySQL connection: ',
   closed : 'MySQL connection closed.',

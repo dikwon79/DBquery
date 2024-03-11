@@ -129,7 +129,7 @@ class AppServer {
         }
 
         // Handle POST requests
-        if (req.method === 'POST' && pathname.startsWith(messages.endpoint)) {
+        if (req.method === 'POST' && pathname.startsWith(messages.endpoint2)) {
             let body = '';
             req.on('data', chunk => {
                 body += chunk.toString();
