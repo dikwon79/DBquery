@@ -16,7 +16,7 @@ class SqlClient {
         if (sqlQuery.toUpperCase().startsWith('(')) {
             queryType = 'POST';
             sqlQuery = messages.insert + sqlQuery;
-            console.log(sqlQuery);
+			console.log(sqlQuery);
         } else {
             alert(messages.noservice);
             return;
@@ -31,7 +31,7 @@ class SqlClient {
         let queryType, endpoint;
         if (sqlQuery.toUpperCase().startsWith('SELECT')) {
             queryType = 'GET';
-            endpoint = `/lab5/api/v1/sql?query=${encodeURIComponent(sqlQuery)}`;
+            endpoint = `/lab5/api/v1/sql/"${encodeURIComponent(sqlQuery)}"`;
         } else if (sqlQuery.toUpperCase().startsWith('INSERT')) {
             queryType = 'POST';
             endpoint = messages.endpoint;
@@ -50,40 +50,46 @@ class SqlClient {
         xhr.open(queryType, url, true);
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-
                 if (xhr.status === 200) {
                     if (queryType === "GET")
                     {
                         document.getElementById('response').innerHTML = ''; // initialize before contents 
+                        console.log(xhr.responseText[3]);
+						if (xhr.responseText[3] == "p")
+                        {
+							
+							
+							let responseData = JSON.parse(xhr.responseText);
 
-                        // JSON data parsing
-                        let responseData = JSON.parse(xhr.responseText);
+							// create table
+							let tableHtml = '<table>';
+							tableHtml += '<tr><th>Patient ID</th><th>Name</th><th>Date of Birth</th></tr>';
 
-                        // create table
-                        let tableHtml = '<table>';
-                        tableHtml += '<tr><th>Patient ID</th><th>Name</th><th>Date of Birth</th></tr>';
+							responseData.forEach(function(patient) {
+								tableHtml += '<tr>';
+								tableHtml += '<td>' + patient.patientid + '</td>';
+								tableHtml += '<td>' + patient.name + '</td>';
+							   
+								let dateOfBirth = patient.dateOfBirth.substring(0, 10); // YYYY-MM-DD 
+								tableHtml += '<td>' + dateOfBirth + '</td>';
+								tableHtml += '</tr>';
+							});
 
-                        responseData.forEach(function(patient) {
-                            tableHtml += '<tr>';
-                            tableHtml += '<td>' + patient.patientid + '</td>';
-                            tableHtml += '<td>' + patient.name + '</td>';
-                           
-                            var dateOfBirth = patient.dateOfBirth.substring(0, 10); // YYYY-MM-DD 
-                            tableHtml += '<td>' + dateOfBirth + '</td>';
-                            tableHtml += '</tr>';
-                        });
+							tableHtml += '</table>';
 
-                        tableHtml += '</table>';
-
-                        // #response 
-                        document.getElementById('response').innerHTML = tableHtml;
+							// #response 
+							document.getElementById('response').innerHTML = tableHtml;
+                        }else{
+							document.getElementById('response').innerHTML = xhr.responseText;
+						}
+                       
                     }
                     else {
 
                         let parsedResponse = JSON.parse(xhr.responseText);
                         console.log(xhr.responseText);
                         // info value
-                        info = parsedResponse.info == "" ? messages.zero : parsedResponse.info;
+                        let info = parsedResponse.info == "" ? messages.zero : parsedResponse.info;
 
                         console.log(info);
                         document.getElementById('response').innerHTML = messages.save + info;

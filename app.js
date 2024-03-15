@@ -144,7 +144,7 @@ class AppServer {
                 } catch (err) {
                     console.error(messages.errorParsing, err);
                     if (!res.headersSent) {
-                        res.writeHead(400, { 'Content-Type': 'text/plain' });
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
                         res.end(messages.badRequest);
                     }
                 }
@@ -154,7 +154,7 @@ class AppServer {
 
         // If none of the above, send 404 Not Found
         if (!res.headersSent) {
-            res.writeHead(404, { 'Content-Type': 'text/plain' });
+            res.writeHead(404, { 'Content-Type': 'application/json' });
             res.end(messages.notFound);
         }
     }
