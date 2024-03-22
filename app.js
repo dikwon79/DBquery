@@ -6,18 +6,13 @@ const messages = require("./server2/lang/messages/en/user");
 class PatientDatabase {
     constructor() {
         this.connection = mysql.createConnection({
-            // host: 'db-mysql-nyc3-61584-do-user-15802968-0.c.db.ondigitalocean.com',
-            // port: 25060,
-            // user: 'doadmin',
-            // password: 'AVNS_gJeBLp6MVV_PyMx3baQ',
-            // database: 'comp4537'
+            host: 'db-mysql-nyc3-61584-do-user-15802968-0.c.db.ondigitalocean.com',
+            port: 25060,
+            user: 'doadmin',
+            password: 'AVNS_gJeBLp6MVV_PyMx3baQ',
+            database: 'comp4537'
 
 
-            host: 'db-mysql-nyc3-77132-do-user-15767645-0.c.db.ondigitalocean.com',   
-            user: 'doadmin',   
-            password: 'AVNS_mLc9P9ieFOUgsmuTkz0',   
-            database: 'defaultdb',   
-            port: 25060
         });
     }
 
